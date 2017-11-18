@@ -13,6 +13,9 @@ Parameters:
   Email:
     Description: The email address where CodePipeline sends pipeline notifications
     Type: String
+  GitHubOAuthToken:
+      Description: GitHubOAuthToken
+      Type: String
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -21,6 +24,7 @@ Metadata:
           default: "CodePipeline Settings"
         Parameters:
           - Email
+          - GitHubOAuthToken
 
 Resources:
   ArtifactStoreBucket:
@@ -58,7 +62,7 @@ Resources:
                 Owner: 'Matusko'
                 Repo: 'lambda-test-prod'
                 Branch: 'master'
-                OAuthToken: '46d5a199762acc19760e1e857f0fe1fddcf92e47'
+                OAuthToken: !Ref GitHubOAuthToken
               OutputArtifacts:
                 - Name: TemplateSource
               RunOrder: '1'
