@@ -75,6 +75,45 @@ Resources:
                 ProjectName: !Ref CodeBuildProject
               RunOrder: 1
 
+        - Name: TestStage
+          Actions:
+            - Name: CreateChangeSet
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              InputArtifacts:
+                - Name: MyAppBuild
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                RoleArn: !GetAtt [CFNRole, Arn]
+                StackName: TestStack
+                ChangeSetName: TestStackChangeSet
+                TemplatePath: "MyAppBuild::NewSamTemplate.yaml"
+              RunOrder: '1'
+
+  CFNRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [cloudformation.amazonaws.com]
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CloudFormationRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'cloudformation:CreateChangeSet'
+                Effect: Allow
+                Resource: '*'
+
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     DependsOn: CodeBuildRole
