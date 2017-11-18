@@ -1,14 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: >
-  AWS CloudFormation Sample Template Continuous Delievery: This template
-  builds an AWS CodePipeline pipeline that implements a continuous delivery release
-  process for AWS CloudFormation stacks. Submit a CloudFormation source artifact
-  to an Amazon S3 location before building the pipeline. The pipeline uses the
-  artifact to automatically create stacks and change sets.
-  **WARNING** This template creates an Amazon EC2 instance. You will be billed
-  for the AWS resources used when you create a stack using this template.
-
+Description: lambda-test-prod
 Parameters:
   Email:
     Description: The email address where CodePipeline sends pipeline notifications
@@ -57,7 +49,7 @@ Resources:
                 Category: Source
                 Owner: ThirdParty
                 Provider: GitHub
-                Version: '1'
+                Version: 1
               Configuration:
                 Owner: 'Matusko'
                 Repo: 'lambda-test-prod'
@@ -65,8 +57,52 @@ Resources:
                 OAuthToken: !Ref GitHubOAuthToken
               OutputArtifacts:
                 - Name: TemplateSource
-              RunOrder: '1'
-              
+              RunOrder: 1
+
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              OutputArtifacts:
+                - Name: MyAppBuild
+              InputArtifacts:
+                - Name: TemplateSource
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              RunOrder: 2
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    DependsOn: CodeBuildRole
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:6.3.1
+        Type: LINUX_CONTAINER
+      Name: CodeBuildProject
+      ServiceRole: !Ref CodeBuildRole
+      Source:
+        Type: CODEPIPELINE
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
   PipelineRole:
     Type: AWS::IAM::Role
     Properties:
