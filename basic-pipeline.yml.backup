@@ -73,7 +73,7 @@ Resources:
                 - Name: TemplateSource
               Configuration:
                 ProjectName: !Ref CodeBuildProject
-              RunOrder: 1
+              RunOrder: 2
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
