@@ -134,6 +134,24 @@ Resources:
             Statement:
               - Action:
                   - 'cloudformation:CreateChangeSet'
+                  - 'iam:GetRole'
+                  - 'iam:CreateRole'
+                  - 'iam:DeleteRole'
+                  - 'iam:AttachRolePolicy'
+                  - 'iam:DetachRolePolicy'
+                  - 'iam:PassRole'
+                  - 'lambda:CreateFunction'
+                  - 'lambda:DeleteFunction'
+                  - 'lambda:GetFunctionConfiguration'
+                  - 'lambda:AddPermission'
+                  - 'lambda:RemovePermission'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                  - 's3:GetBucketVersioning'
+                  - 'apigateway:POST'
+                  - 'apigateway:DELETE'
+                  - 'apigateway:PATCH'
+                  - 'apigateway:GET'
                 Effect: Allow
                 Resource: '*'
 
